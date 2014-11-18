@@ -7,6 +7,7 @@ from .utils import get_user_model
 User = get_user_model()
 
 from .models import Subscription
+from .settings import newsletter_settings
 
 
 class NewsletterForm(forms.ModelForm):
@@ -27,6 +28,10 @@ class NewsletterForm(forms.ModelForm):
             del kwargs['ip']
         else:
             ip = None
+
+        if 'user' in kwargs:
+            self.user = kwargs['user']
+            del kwargs['user']
 
         super(NewsletterForm, self).__init__(*args, **kwargs)
 
@@ -50,17 +55,31 @@ class SubscribeRequestForm(NewsletterForm):
             raise ValidationError(_("An e-mail address is required."))
 
         # Check whether we should be subscribed to as a user
-        try:
-            user = User.objects.get(email__exact=data)
+        if not newsletter_settings.USER_MODE_DISABLED:
+            try:
+                user = User.objects.get(email__exact=data)
 
-            raise ValidationError(_(
-                "The e-mail address '%(email)s' belongs to a user with an "
-                "account on this site. Please log in as that user "
-                "and try again."
-            ) % {'email': user.email})
+                raise ValidationError(_(
+                    "The e-mail address '%(email)s' belongs to a user with an "
+                    "account on this site. Please log in as that user "
+                    "and try again."
+                ) % {'email': user.email})
 
-        except User.DoesNotExist:
-            pass
+            except User.DoesNotExist:
+                pass
+        else:
+            try:
+                user = User.objects.get(email__exact=data)
+
+                if user != self.user:
+                    raise ValidationError(_(
+                        "The e-mail address '%(email)s' belongs to a user "
+                        "with an account on this site. Please log in as that "
+                        "user and try again."
+                    ) % {'email': user.email})
+
+            except User.DoesNotExist:
+                pass
 
         # Check whether we have already been subscribed to
         try:

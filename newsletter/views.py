@@ -90,14 +90,24 @@ class NewsletterListView(NewsletterViewBase, ListView):
         # Before rendering the formset, subscription objects should
         # already exist.
         for n in newsletters:
-            Subscription.objects.get_or_create(
-                newsletter=n, user=user
-            )
+            if not newsletter_settings.USER_MODE_DISABLED:
+                Subscription.objects.get_or_create(
+                    newsletter=n, user=user
+                )
+            else:
+                Subscription.objects.get_or_create(
+                    newsletter=n, email_field=user.email
+                )
 
         # Get all subscriptions for use in the formset
-        qs = Subscription.objects.filter(
-            newsletter__in=newsletters, user=user
-        )
+        if not newsletter_settings.USER_MODE_DISABLED:
+            qs = Subscription.objects.filter(
+                newsletter__in=newsletters, user=user
+            )
+        else:
+            qs = Subscription.objects.filter(
+                newsletter__in=newsletters, email_field=user.email
+            )
 
         if request.method == 'POST':
             try:
@@ -410,6 +420,11 @@ class ActionRequestView(ActionFormView):
         ):
             # Confirmation email for this action was switched off in settings.
             return self.no_email_confirm(form)
+        elif newsletter_settings.USER_MODE_DISABLED:
+            if self.request.user.is_authenticated():
+                # If here, user is authenticated and the email matches their
+                # account so confirm without sending an activation email
+                return self.no_email_confirm(form)
 
         try:
             self.subscription.send_activation_email(action=self.action)
@@ -440,15 +455,19 @@ class SubscribeRequestView(ActionRequestView):
         if self.request.method in ('POST', 'PUT'):
             kwargs['ip'] = self.request.META.get('REMOTE_ADDR')
 
+        if self.request.user.is_authenticated():
+            kwargs['user'] = self.request.user
+
         return kwargs
 
     def get_subscription(self, form):
         return form.save()
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
-            kwargs['confirm'] = self.confirm
-            return SubscribeUserView.as_view()(request, *args, **kwargs)
+        if not newsletter_settings.USER_MODE_DISABLED:
+            if request.user.is_authenticated():
+                kwargs['confirm'] = self.confirm
+                return SubscribeUserView.as_view()(request, *args, **kwargs)
 
         return super(SubscribeRequestView, self).dispatch(
             request, *args, **kwargs

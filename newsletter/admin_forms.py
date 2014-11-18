@@ -16,6 +16,7 @@ from django.utils.translation import ugettext
 from django.conf import settings
 
 from .models import Subscription, Newsletter, Submission
+from .settings import newsletter_settings
 
 
 def make_subscription(newsletter, email, name=None):
@@ -448,29 +449,40 @@ class SubscriptionAdminForm(forms.ModelForm):
 
     def clean_email_field(self):
         data = self.cleaned_data['email_field']
-        if self.cleaned_data['user'] and data:
-            raise forms.ValidationError(_(
-                'If a user has been selected this field '
-                'should remain empty.'))
+
+        if not newsletter_settings.USER_MODE_DISABLED:
+            if self.cleaned_data['user'] and data:
+                raise forms.ValidationError(_(
+                    'If a user has been selected this field '
+                    'should remain empty.'))
         return data
 
     def clean_name_field(self):
         data = self.cleaned_data['name_field']
-        if self.cleaned_data['user'] and data:
-            raise forms.ValidationError(_(
-                'If a user has been selected '
-                'this field should remain empty.'))
+        if not newsletter_settings.USER_MODE_DISABLED:
+            if self.cleaned_data['user'] and data:
+                raise forms.ValidationError(_(
+                    'If a user has been selected '
+                    'this field should remain empty.'))
         return data
 
     def clean(self):
         cleaned_data = super(SubscriptionAdminForm, self).clean()
-        if not (cleaned_data.get('user', None) or
-                cleaned_data.get('email_field', None)):
 
-            raise forms.ValidationError(_(
-                'Either a user must be selected or an email address must '
-                'be specified.')
-            )
+        if not newsletter_settings.USER_MODE_DISABLED:
+            if not (cleaned_data.get('user', None) or
+                    cleaned_data.get('email_field', None)):
+
+                raise forms.ValidationError(_(
+                    'Either a user must be selected or an email address must '
+                    'be specified.')
+                )
+        else:
+            if not cleaned_data.get('email_field', None):
+                raise forms.ValidationError(_(
+                    'An email address must be specified.')
+                )
+
         return cleaned_data
 
 

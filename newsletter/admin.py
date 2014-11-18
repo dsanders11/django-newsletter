@@ -344,6 +344,12 @@ class SubscriptionAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin):
     actions = ['make_subscribed', 'make_unsubscribed']
     exclude = ['unsubscribed']
 
+    def __init__(self, *args, **kwargs):
+        super(SubscriptionAdmin, self).__init__(*args, **kwargs)
+
+        if newsletter_settings.USER_MODE_DISABLED:
+            self.exclude.append('user')
+
     """ List extensions """
     def admin_newsletter(self, obj):
         return '<a href="../newsletter/%s/">%s</a>' % (

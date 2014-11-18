@@ -66,6 +66,10 @@ class NewsletterSettings(Settings):
     DEFAULT_CONFIRM_EMAIL = True
 
     @property
+    def USER_MODE_DISABLED(self):
+        return getattr(django_settings, "NEWSLETTER_USER_MODE_DISABLED", False)
+
+    @property
     def DEFAULT_CONFIRM_EMAIL_SUBSCRIBE(self):
         return self.CONFIRM_EMAIL
 
