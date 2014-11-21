@@ -412,7 +412,7 @@ class ActionRequestView(ActionFormView):
         return self.get_url_from_viewname('newsletter_activation_email_sent')
 
     def form_valid(self, form):
-        self.subscription = self.get_subscription(form)
+        self.subscription = subscription = self.get_subscription(form)
 
         if not getattr(
                 newsletter_settings,
@@ -421,18 +421,20 @@ class ActionRequestView(ActionFormView):
             # Confirmation email for this action was switched off in settings.
             return self.no_email_confirm(form)
         elif newsletter_settings.USER_MODE_DISABLED:
-            if self.request.user.is_authenticated():
+            user = self.request.user
+
+            if user.is_authenticated() and user.email == subscription.email:
                 # If here, user is authenticated and the email matches their
-                # account so confirm without sending an activation email
+                # account so confirm without sending an email
                 return self.no_email_confirm(form)
 
         try:
-            self.subscription.send_activation_email(action=self.action)
+            subscription.send_activation_email(action=self.action)
 
         except (SMTPException, socket.error), e:
             logger.exception(
                 'Error %s while submitting email to %s.',
-                e, self.subscription.email
+                e, subscription.email
             )
             self.error = True
 
