@@ -32,6 +32,8 @@ class NewsletterForm(forms.ModelForm):
         if 'user' in kwargs:
             self.user = kwargs['user']
             del kwargs['user']
+        else:
+            self.user = None
 
         super(NewsletterForm, self).__init__(*args, **kwargs)
 
@@ -71,7 +73,7 @@ class SubscribeRequestForm(NewsletterForm):
             try:
                 user = User.objects.get(email__exact=data)
 
-                if user != self.user:
+                if self.user is None or user != self.user:
                     raise ValidationError(_(
                         "The e-mail address '%(email)s' belongs to a user "
                         "with an account on this site. Please log in as that "
