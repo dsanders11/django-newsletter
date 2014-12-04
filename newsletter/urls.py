@@ -51,7 +51,7 @@ urlpatterns = patterns(
         '^<newsletter_slug:s>/<action=subscribe|update|unsubscribe>/'
         'email-sent/$',
         ActionTemplateView.as_view(
-            template_name='newsletter/subscription_%(action)s_email_sent.html'
+            template_name='subscription_%(action)s_email_sent.html'
         ),
         name='newsletter_activation_email_sent'),
 
@@ -72,7 +72,7 @@ urlpatterns = patterns(
         '^<newsletter_slug:s>/<action=subscribe|update|unsubscribe>/'
         'activation-completed/$',
         ActionTemplateView.as_view(
-            template_name='newsletter/subscription_%(action)s_activated.html'
+            template_name='subscription_%(action)s_activated.html'
         ),
         name='newsletter_action_activated'),
 

@@ -191,6 +191,25 @@ class NewsletterMixin(ProcessUrlDataMixin):
 
         return context
 
+    def get_template_names(self):
+        """ Return list of template names for the newsletter. """
+
+        base_templates = [
+            "newsletter/%(newsletter_slug)s/" % {
+                'newsletter_slug': self.newsletter.slug
+            },
+            "newsletter/"
+        ]
+
+        templates = super(NewsletterMixin, self).get_template_names()
+        template_names = []
+
+        for base in base_templates:
+            for template in templates:
+                template_names.append(base + template)
+
+        return template_names
+
 
 class ActionMixin(ProcessUrlDataMixin):
     """ Mixin retrieving action from url and adding it to context. """
@@ -245,7 +264,6 @@ class ActionTemplateView(NewsletterMixin, ActionMixin, TemplateView):
     View that renders a template for proper action,
     with newsletter and action in context.
     """
-    pass
 
 
 class ActionFormView(NewsletterMixin, ActionMixin, FormView):
@@ -268,7 +286,7 @@ class ActionFormView(NewsletterMixin, ActionMixin, FormView):
 
 class ActionUserView(ActionTemplateView):
     """ Base class for subscribe and unsubscribe user views. """
-    template_name = "newsletter/subscription_%(action)s_user.html"
+    template_name = "subscription_%(action)s_user.html"
 
     def process_url_data(self, *args, **kwargs):
         """ Add confirm to instance attributes. """
@@ -366,7 +384,7 @@ class UnsubscribeUserView(ActionUserView):
 
 class ActionRequestView(ActionFormView):
     """ Base class for subscribe, unsubscribe and update request views. """
-    template_name = "newsletter/subscription_%(action)s.html"
+    template_name = "subscription_%(action)s.html"
 
     def process_url_data(self, *args, **kwargs):
         """ Add error to instance attributes. """
@@ -481,7 +499,7 @@ class UpdateRequestView(ActionRequestView):
 
 class UpdateSubscriptionView(ActionFormView):
     form_class = UpdateForm
-    template_name = "newsletter/subscription_activate.html"
+    template_name = "subscription_activate.html"
 
     def process_url_data(self, *args, **kwargs):
         """
@@ -571,7 +589,21 @@ class SubmissionViewBase(NewsletterMixin):
 
 
 class SubmissionArchiveIndexView(SubmissionViewBase, ArchiveIndexView):
-    pass
+    def get_template_names(self):
+        """ Return list of template names for the index view. """
+
+        tpls = super(SubmissionArchiveIndexView, self).get_template_names()
+        templates = []
+
+        # The generated template names from ArchiveIndexView have the
+        # name of the app prepended by default, which messes things up
+        # so we take the list of templates returned and remove it.
+        for template in tpls:
+            if template.startswith("newsletter/"):
+                # Trim the leading 'newsletter/'
+                templates.append(template[11:])
+
+        return templates
 
 
 class SubmissionArchiveDetailView(SubmissionViewBase, DateDetailView):
