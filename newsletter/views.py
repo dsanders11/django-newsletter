@@ -500,9 +500,10 @@ class UnsubscribeRequestView(ActionRequestView):
     confirm = False
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
-            kwargs['confirm'] = self.confirm
-            return UnsubscribeUserView.as_view()(request, *args, **kwargs)
+        if not newsletter_settings.USER_MODE_DISABLED:
+            if request.user.is_authenticated():
+                kwargs['confirm'] = self.confirm
+                return UnsubscribeUserView.as_view()(request, *args, **kwargs)
 
         return super(UnsubscribeRequestView, self).dispatch(
             request, *args, **kwargs
