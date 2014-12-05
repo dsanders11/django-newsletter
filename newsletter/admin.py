@@ -28,12 +28,12 @@ from .models import (
     Newsletter, Subscription, Article, Message, Submission
 )
 
-from django.utils.timezone import now
-
 from .admin_forms import *
 from .admin_utils import *
 
 from .settings import newsletter_settings
+
+from .utils import now
 
 # Contsruct URL's for icons
 ICON_URLS = {
@@ -99,7 +99,7 @@ class SubmissionAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin):
 
     def admin_publish_date(self, obj):
         if obj.publish_date:
-            return date_format(obj.publish_date, 'DATETIME_FORMAT')
+            return date_format(obj.get_publish_date(), 'DATETIME_FORMAT')
         else:
             return ''
     admin_publish_date.short_description = _("publish date")
@@ -110,7 +110,7 @@ class SubmissionAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin):
                 return u'<img src="%s" width="10" height="10" alt="%s"/>' % (
                     ICON_URLS['yes'], self.admin_status_text(obj))
             else:
-                if obj.publish_date > now():
+                if obj.get_publish_date() > now():
                     return \
                         u'<img src="%s" width="10" height="10" alt="%s"/>' % (
                             ICON_URLS['wait'], self.admin_status_text(obj))
@@ -130,7 +130,7 @@ class SubmissionAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin):
             if obj.sent:
                 return ugettext("Sent.")
             else:
-                if obj.publish_date > now():
+                if obj.get_publish_date() > now():
                     return ugettext("Delayed submission.")
                 else:
                     return ugettext("Submitting.")

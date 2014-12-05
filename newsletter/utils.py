@@ -10,7 +10,11 @@ try:
 except ImportError:
     from django.utils.hashcompat import sha_constructor as sha1
 
+from django.conf import settings
+
 from django.contrib.sites.models import Site
+
+from django.utils import timezone
 
 from datetime import datetime
 
@@ -45,6 +49,15 @@ def make_activation_code():
 def get_default_sites():
     """ Get a list of id's for all sites; the default for newsletters. """
     return [site.id for site in Site.objects.all()]
+
+
+def now():
+    """ Return the current time in a timzeone aware way """
+
+    if not settings.USE_TZ:
+        return timezone.now()
+    else:
+        return datetime.now(timezone.get_default_timezone())
 
 
 class Singleton(type):

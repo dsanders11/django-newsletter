@@ -1,5 +1,7 @@
 import logging
 
+from datetime import date, timedelta
+
 logger = logging.getLogger(__name__)
 
 from django.core import mail
@@ -138,3 +140,9 @@ def template_exists(template_name):
         return True
     except TemplateDoesNotExist:
         return False
+
+
+class FauxDate(date):
+    @staticmethod
+    def today():
+        return date.today() - timedelta(days=1)

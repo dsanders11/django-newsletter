@@ -7,9 +7,10 @@ from django.db.models import permalink
 from django.template import Context, TemplateDoesNotExist
 from django.template.loader import select_template
 
+from django.utils.timezone import get_default_timezone, get_current_timezone
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
-from django.utils.timezone import now
 
 from django.core.mail import EmailMultiAlternatives
 
@@ -21,7 +22,7 @@ from django.conf import settings
 from sorl.thumbnail import ImageField
 
 from .utils import (
-    make_activation_code, get_default_sites, ACTIONS, get_user_model
+    make_activation_code, get_default_sites, ACTIONS, get_user_model, now
 )
 User = get_user_model()
 
@@ -532,10 +533,22 @@ class Submission(models.Model):
         verbose_name_plural = _('submissions')
 
     def __unicode__(self):
+        publish_date = self.get_publish_date()
+
         return _(u"%(newsletter)s on %(publish_date)s") % {
             'newsletter': self.message,
-            'publish_date': self.publish_date
+            'publish_date': publish_date
         }
+
+    def get_publish_date(self):
+        """ Return the publish date in a timezone-aware manner """
+
+        publish_date = self.publish_date
+
+        if settings.USE_TZ:
+            publish_date = self.publish_date.astimezone(get_default_timezone())
+
+        return publish_date
 
     def submit(self):
         subscriptions = self.subscriptions.filter(subscribed=True)
@@ -642,12 +655,14 @@ class Submission(models.Model):
         assert self.newsletter.slug
         assert self.message.slug
 
+        publish_date = self.get_publish_date()
+
         return (
             'newsletter_archive_detail', (), {
                 'newsletter_slug': self.newsletter.slug,
-                'year': self.publish_date.year,
-                'month': self.publish_date.month,
-                'day': self.publish_date.day,
+                'year': publish_date.year,
+                'month': publish_date.month,
+                'day': publish_date.day,
                 'slug': self.message.slug
             }
         )

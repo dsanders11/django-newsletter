@@ -6,7 +6,9 @@ from datetime import datetime, timedelta
 
 import time
 
-# Conditioally import pytz
+import mock
+
+# Conditionally import pytz
 try:
     import pytz
 except ImportError:
@@ -27,10 +29,12 @@ from ..models import (
 
 from ..forms import UpdateForm
 
-from ..utils import get_user_model
+from ..utils import get_user_model, now
 User = get_user_model()
 
-from .utils import MailTestCase, UserTestCase, WebTestCase, ComparingTestCase
+from .utils import (
+    MailTestCase, UserTestCase, WebTestCase, ComparingTestCase, FauxDate
+)
 
 
 # Amount of seconds to wait to test time comparisons in submissions.
@@ -451,7 +455,7 @@ class UserSubscribeTestCase(
         subscription.save()
 
         self.assertLessThan(
-            subscription.subscribe_date, timezone.now() + timedelta(seconds=1)
+            subscription.subscribe_date, now() + timedelta(seconds=1)
         )
 
         response = self.client.get(self.unsubscribe_url)
@@ -500,7 +504,7 @@ class UserSubscribeTestCase(
         self.assert_(subscription.unsubscribed)
         self.assertLessThan(
             subscription.unsubscribe_date,
-            timezone.now() + timedelta(seconds=1)
+            now() + timedelta(seconds=1)
         )
 
     def test_unsubscribe_twice(self):
@@ -947,7 +951,7 @@ class AnonymousSubscribeTestCase(
         self.assertEqual(subscription.name, testname2)
         self.assertEqual(subscription.email, testemail2)
 
-        dt = (timezone.now() - subscription.unsubscribe_date).seconds
+        dt = (now() - subscription.unsubscribe_date).seconds
         self.assertLessThan(dt, 2)
 
     def test_update_request_view(self):
@@ -1157,7 +1161,7 @@ class InvisibleUserSubscribeTestCase(UserSubscribeTestCase):
         self.n.save()
 
 
-class ArchiveTestcase(NewsletterListTestCase):
+class BaseArchiveTestCase(NewsletterListTestCase):
     def setUp(self):
         """ Make sure we have a few submissions to test with. """
 
@@ -1184,6 +1188,8 @@ class ArchiveTestcase(NewsletterListTestCase):
         # Create a submission
         self.submission = Submission.from_message(message)
 
+
+class ArchiveTestCase(BaseArchiveTestCase):
     def test_archive_invisible(self):
         """ Test whether an invisible newsletter is indeed not shown. """
 
@@ -1210,6 +1216,8 @@ class ArchiveTestcase(NewsletterListTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertContains(response, self.submission.message.title)
+        self.assertContains(response, self.submission.get_publish_date())
+
         self.assertContains(response, self.submission.get_absolute_url())
 
     def test_archive_detail(self):
@@ -1267,7 +1275,32 @@ class ArchiveTestcase(NewsletterListTestCase):
         timezone.activate('America/New_York')
 
         # Test viewing the submission
-        self.test_archive_detail()
+        try:
+            self.test_archive_detail()
+        finally:
+            timezone.deactivate()
+
+
+@override_settings(
+    TIME_ZONE='US/Pacific',
+    USE_TZ=True
+)
+@mock.patch('datetime.date', new=FauxDate)
+class TimezoneArchiveTestCase(BaseArchiveTestCase):
+    # In ArchiveTestCase override_settings doesn't cover setUp so we need this
+    # to be a separate test case where we can set the timezone for the entire
+    # test instead of a single test method. Otherwise the submission is created
+    # under different timezone settings which causes problems in of itself.
+
+    def test_archive_detail_timezone_issue(self):
+        """ Test Submission detail view. """
+
+        detail_url = self.submission.get_absolute_url()
+
+        response = self.client.get(detail_url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, self.submission.message.title)
 
 
 class ActionTemplateViewMixin(object):
