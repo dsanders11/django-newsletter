@@ -21,6 +21,8 @@ from django.conf import settings
 
 from sorl.thumbnail import ImageField
 
+from .managers import SubscriptionManager
+
 from .utils import (
     make_activation_code, get_default_sites, ACTIONS, get_user_model, now
 )
@@ -157,6 +159,8 @@ class Newsletter(models.Model):
 
 
 class Subscription(models.Model):
+    objects = SubscriptionManager()
+
     user = models.ForeignKey(
         User, blank=True, null=True, verbose_name=_('user')
     )
