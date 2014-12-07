@@ -90,7 +90,7 @@ def parse_csv(myfile, newsletter, ignore_errors=False):
 
     detector = UniversalDetector()
 
-    for line in myfile.readlines():
+    for line in myfile:
         detector.feed(line)
         if detector.done:
             break
