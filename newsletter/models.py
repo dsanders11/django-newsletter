@@ -358,7 +358,8 @@ class Subscription(models.Model):
             'newsletter': self.newsletter,
             'date': self.subscribe_date,
             'STATIC_URL': settings.STATIC_URL,
-            'MEDIA_URL': settings.MEDIA_URL
+            'MEDIA_URL': settings.MEDIA_URL,
+            'settings': settings
         }
 
         unescaped_context = Context(variable_dict, autoescape=False)
@@ -577,7 +578,8 @@ class Submission(models.Model):
                     'newsletter': self.newsletter,
                     'date': self.publish_date,
                     'STATIC_URL': settings.STATIC_URL,
-                    'MEDIA_URL': settings.MEDIA_URL
+                    'MEDIA_URL': settings.MEDIA_URL,
+                    'settings': settings
                 }
 
                 unescaped_context = Context(variable_dict, autoescape=False)
