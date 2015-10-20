@@ -2,14 +2,18 @@
 django-newsletter
 =================
 
-.. image:: https://badge.fury.io/py/django-newsletter.png
-    :target: http://badge.fury.io/py/django-newsletter
+.. image:: https://img.shields.io/pypi/v/django-newsletter.svg
+    :target: https://pypi.python.org/pypi/django-newsletter
 
-.. image:: https://secure.travis-ci.org/dokterbob/django-newsletter.png?branch=master
+.. image:: https://img.shields.io/travis/dokterbob/django-newsletter/master.svg
     :target: http://travis-ci.org/dokterbob/django-newsletter
 
-.. image:: https://pypip.in/d/django-newsletter/badge.png
-        :target: https://crate.io/packages/django-newsletter?version=latest
+.. image:: https://img.shields.io/coveralls/dokterbob/django-newsletter/master.svg
+    :target: https://coveralls.io/github/dokterbob/django-newsletter
+
+.. image:: https://landscape.io/github/dokterbob/django-newsletter/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/dokterbob/django-newsletter/master
+   :alt: Code Health
 
 Newsletter application for the Django web framework.
 ----------------------------------------------------
@@ -43,9 +47,9 @@ soon as near-full coverage is reached.
 
 Compatibility
 =============
-Currently, django-newsletter is being tested to run on Python 2.6, 2.7 and the
-latest Django 1.4 and 1.5 releases. Apart from tests it *should* be compatible
-with Python 2.5 as well.
+Currently, django-newsletter is being tested to run on Python 2.7 and the
+latest Django 1.4, 1.7 releases with 1.8 being under way.
+Apart from tests it *might* be compatible with Python 2.5 and 2.6 as well.
 
 Requirements
 ============

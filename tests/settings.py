@@ -1,3 +1,6 @@
+import os
+test_dir = os.path.dirname(__file__)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3'
@@ -30,14 +33,21 @@ except ImportError:
     # South not installed and hence is not required
     pass
 
-ROOT_URLCONF = 'test_urls'
+ROOT_URLCONF = 'tests.urls'
 
 SITE_ID = 1
 
-TEMPLATE_DIRS = ('test_templates', )
+TEMPLATE_DIRS = (os.path.join(test_dir, 'templates'), )
 
 # Enable time-zone support for Django 1.4 (ignored in older versions)
 USE_TZ = True
 
 # Required for django-webtest to work
 STATIC_URL = '/static/'
+
+# Random secret key
+import random
+key_chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+SECRET_KEY = ''.join([
+    random.SystemRandom().choice(key_chars) for i in range(50)
+])
