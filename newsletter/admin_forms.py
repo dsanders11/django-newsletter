@@ -56,7 +56,7 @@ def check_email(email, ignore_errors=False):
         Subscription._meta.get_field_by_name('email_field')[0].max_length
 
     if len(email) <= email_length or ignore_errors:
-        return email[:email_length]
+        return email[:email_length].strip()
     else:
         raise forms.ValidationError(
             _(
@@ -195,7 +195,8 @@ def parse_csv(myfile, newsletter, ignore_errors=False):
 
     logger.debug('Extracting data.')
 
-    addresses = {}
+    addresses = []
+    emails = set()
     for row in myreader:
         if not max(namecol, mailcol) < len(row):
             logger.warn("Column count does not match for row number %d",
@@ -231,7 +232,7 @@ def parse_csv(myfile, newsletter, ignore_errors=False):
                 )
 
         if addr:
-            if email in addresses:
+            if email in emails:
                 logger.warn(
                     "Entry '%s' at line %d contains a "
                     "duplicate entry for '%s'",
@@ -243,7 +244,8 @@ def parse_csv(myfile, newsletter, ignore_errors=False):
                         "The address file contains duplicate entries "
                         "for '%s'.") % email)
 
-            addresses.update({email: addr})
+            emails.add(email)
+            addresses.append({'email': email, 'name': name})
         else:
             logger.warn(
                 "Entry '%s' at line %d is already subscribed to "
@@ -272,7 +274,8 @@ def parse_vcard(myfile, newsletter, ignore_errors=False):
             _(u"Error reading vCard file: %s" % e)
         )
 
-    addresses = {}
+    addresses = []
+    emails = set()
 
     for myvcard in myvcards:
         if hasattr(myvcard, 'fn'):
@@ -302,13 +305,14 @@ def parse_vcard(myfile, newsletter, ignore_errors=False):
                 )
 
         if addr:
-            if email in addresses and not ignore_errors:
+            if email in emails and not ignore_errors:
                 raise forms.ValidationError(
                     _("The address file contains duplicate entries for '%s'.")
                     % email
                 )
 
-            addresses.update({email: addr})
+            emails.add(email)
+            addresses.append({'email': email, 'name': name})
         elif not ignore_errors:
             raise forms.ValidationError(
                 _("Some entries are already subscribed to."))
@@ -326,7 +330,8 @@ def parse_ldif(myfile, newsletter, ignore_errors=False):
     from addressimport import ldif
 
     class AddressParser(ldif.LDIFParser):
-        addresses = {}
+        addresses = []
+        emails = set()
 
         def handle(self, dn, entry):
             if 'mail' in entry:
@@ -347,13 +352,14 @@ def parse_ldif(myfile, newsletter, ignore_errors=False):
                         )
 
                 if addr:
-                    if email in self.addresses and not ignore_errors:
+                    if email in self.emails and not ignore_errors:
                         raise forms.ValidationError(_(
                             "The address file contains duplicate entries "
                             "for '%s'.") % email
                         )
 
-                    self.addresses.update({email: addr})
+                    self.emails.add(email)
+                    self.addresses.append({'email': email, 'name': name})
                 elif not ignore_errors:
                     raise forms.ValidationError(
                         _("Some entries are already subscribed to."))
@@ -400,8 +406,6 @@ class ImportForm(forms.Form):
             raise forms.ValidationError(_(
                 "File type '%s' was not recognized.") % content_type)
 
-        self.addresses = []
-
         ext = myvalue.name.rsplit('.', 1)[-1].lower()
         if ext == 'vcf':
             self.addresses = parse_vcard(
@@ -430,7 +434,7 @@ class ImportForm(forms.Form):
             logger.debug('Getting addresses: %s', self.addresses)
             return self.addresses
         else:
-            return {}
+            return []
 
     newsletter = forms.ModelChoiceField(
         label=_("Newsletter"),
