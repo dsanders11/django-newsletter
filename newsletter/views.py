@@ -261,7 +261,7 @@ class ActionMixin(ProcessUrlDataMixin):
         else:
             try:
                 return [self.template_name % {'action': self.action}]
-            except KeyError, e:
+            except KeyError as e:
                 raise ImproperlyConfigured(
                     '%(class_name)s inherits from ActionMixin and can contain '
                     '%%(action)s in template_name to be replaced '
@@ -452,7 +452,7 @@ class ActionRequestView(ActionFormView):
         try:
             subscription.send_activation_email(action=self.action)
 
-        except (SMTPException, socket.error), e:
+        except (SMTPException, socket.error) as e:
             logger.exception(
                 'Error %s while submitting email to %s.',
                 e, subscription.email

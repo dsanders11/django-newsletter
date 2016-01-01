@@ -21,6 +21,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 
 from django.utils import timezone
+from django.utils.encoding import force_text
 
 from django.test.utils import override_settings, patch_logger
 
@@ -486,7 +487,7 @@ class UserSubscribeTestCase(
 
         self.assertIn(
             'You are not subscribed to',
-            unicode(list(response.context['messages'])[0])
+            force_text(list(response.context['messages'])[0])
         )
 
     def test_unsubscribe_post(self):

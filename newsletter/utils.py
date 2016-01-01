@@ -13,6 +13,7 @@ except ImportError:
 from django.conf import settings
 
 from django.contrib.sites.models import Site
+from django.utils.encoding import force_bytes
 
 from django.utils import timezone
 
@@ -38,12 +39,12 @@ def get_user_model():
 def make_activation_code():
     """ Generate a unique activation code. """
     random_string = str(random.random())
-    random_digest = sha1(random_string).hexdigest()[:5]
+    random_digest = sha1(force_bytes(random_string)).hexdigest()[:5]
     time_string = str(datetime.now().microsecond)
 
     combined_string = random_digest + time_string
 
-    return sha1(combined_string).hexdigest()
+    return sha1(force_bytes(combined_string)).hexdigest()
 
 
 def get_default_sites():
