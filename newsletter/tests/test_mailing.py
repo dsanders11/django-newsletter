@@ -1,10 +1,12 @@
 import itertools
 
+import unittest
+
 from datetime import timedelta
 
 from django.core import mail
 
-from django.utils import unittest
+from django.utils.timezone import now
 
 from ..models import (
     Newsletter, Subscription, Submission, Message, Article, get_default_sites

@@ -7,8 +7,9 @@ from datetime import datetime, timedelta
 import time
 
 import mock
+import unittest
 
-# Conditionally import pytz
+# Conditioally import pytz
 try:
     import pytz
 except ImportError:
@@ -19,7 +20,7 @@ from django import VERSION as DJANGO_VERSION
 from django.core import mail
 from django.core.urlresolvers import reverse
 
-from django.utils import unittest, timezone
+from django.utils import timezone
 
 from django.test.utils import override_settings
 
