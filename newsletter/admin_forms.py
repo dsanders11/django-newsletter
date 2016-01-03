@@ -20,6 +20,9 @@ from .settings import newsletter_settings
 
 
 def make_subscription(newsletter, email, name=None):
+    """
+    Return (unsaved) Subscription for newsletter based on email and name.
+    """
     qs = Subscription.objects.filter(
         newsletter__id=newsletter.id,
         subscribed=True,
@@ -40,6 +43,12 @@ def make_subscription(newsletter, email, name=None):
 
 
 def check_email(email, ignore_errors=False):
+    """
+    Check (length of) email address.
+
+    TODO: Update this to perform full validation on email.
+    """
+
     if settings.DEBUG:
         logger.debug("Checking e-mail address %s", email)
 
@@ -61,6 +70,11 @@ def check_email(email, ignore_errors=False):
 
 
 def check_name(name, ignore_errors=False):
+    """
+    Check (length of) name.
+
+    TODO: Update this to perform full validation on name.
+    """
     if settings.DEBUG:
         logger.debug("Checking name: %s", name)
 
@@ -81,6 +95,12 @@ def check_name(name, ignore_errors=False):
 
 
 def parse_csv(myfile, newsletter, ignore_errors=False):
+    """
+    Parse addresses from CSV file-object into newsletter.
+
+    Returns a dictionary mapping email addresses into Subscription objects.
+    """
+
     from newsletter.addressimport.csv_util import UnicodeReader
     import codecs
     import csv
@@ -238,6 +258,11 @@ def parse_csv(myfile, newsletter, ignore_errors=False):
 
 
 def parse_vcard(myfile, newsletter, ignore_errors=False):
+    """
+    Parse addresses from vCard file-object into newsletter.
+
+    Returns a dictionary mapping email addresses into Subscription objects.
+    """
     import vobject
 
     try:
@@ -292,6 +317,12 @@ def parse_vcard(myfile, newsletter, ignore_errors=False):
 
 
 def parse_ldif(myfile, newsletter, ignore_errors=False):
+    """
+    Parse addresses from LDIF file-object into newsletter.
+
+    Returns a dictionary mapping email addresses into Subscription objects.
+    """
+
     from addressimport import ldif
 
     class AddressParser(ldif.LDIFParser):
