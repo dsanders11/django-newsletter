@@ -4,7 +4,10 @@ from datetime import date, timedelta
 
 logger = logging.getLogger(__name__)
 
+import smtplib
+
 from django.core import mail
+from django.core.mail.backends.base import BaseEmailBackend
 
 from django.test import TestCase
 
@@ -146,3 +149,10 @@ class FauxDate(date):
     @staticmethod
     def today():
         return date.today() - timedelta(days=1)
+
+
+class FailingEmailBackend(BaseEmailBackend):
+    """ Email backend that just fails, for testing purposes. """
+
+    def send_messages(self, email_messages):
+        raise smtplib.SMTPException('Connection refused')
