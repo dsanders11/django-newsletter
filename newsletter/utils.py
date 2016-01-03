@@ -5,10 +5,8 @@ logger = logging.getLogger(__name__)
 
 import random
 
-try:
-    from hashlib import sha1
-except ImportError:
-    from django.utils.hashcompat import sha_constructor as sha1
+from datetime import datetime
+from hashlib import sha1
 
 from django.conf import settings
 
@@ -17,23 +15,8 @@ from django.utils.encoding import force_bytes
 
 from django.utils import timezone
 
-from datetime import datetime
-
 # Possible actions that user can perform
 ACTIONS = ('subscribe', 'unsubscribe', 'update')
-
-
-def get_user_model():
-    """ get_user_model compatibility wrapper. Returns active User model. """
-    try:
-        from django.contrib.auth import get_user_model
-    except ImportError:
-        # Django < v1.5
-        from django.contrib.auth.models import User
-    else:
-        User = get_user_model()
-
-    return User
 
 
 def make_activation_code():

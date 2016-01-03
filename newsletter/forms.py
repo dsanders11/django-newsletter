@@ -1,13 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
-
 from django import forms
-try:
-    from django.forms.utils import ValidationError
-except ImportError:  # Django < 1.7
-    from django.forms.util import ValidationError
-
-from .utils import get_user_model
-User = get_user_model()
+from django.contrib.auth import get_user_model
+from django.forms.utils import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 from .models import Subscription
 from .settings import newsletter_settings
@@ -73,15 +67,15 @@ class SubscribeRequestForm(NewsletterForm):
             except User.DoesNotExist:
                 pass
         else:
+            User = get_user_model()
             try:
                 user = User.objects.get(email__exact=data)
 
-                if self.user is None or user != self.user:
-                    raise ValidationError(_(
-                        "The e-mail address '%(email)s' belongs to a user "
-                        "with an account on this site. Please log in as that "
-                        "user and try again."
-                    ) % {'email': user.email})
+                raise ValidationError(_(
+                    "The e-mail address '%(email)s' belongs to a user with an "
+                    "account on this site. Please log in as that user "
+                    "and try again."
+                ) % {'email': user.email})
 
             except User.DoesNotExist:
                 pass
@@ -132,6 +126,7 @@ class UpdateRequestForm(NewsletterForm):
             raise ValidationError(_("An e-mail address is required."))
 
         # Check whether we should update as a user
+        User = get_user_model()
         try:
             user = User.objects.get(email__exact=data)
 
