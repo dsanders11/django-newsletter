@@ -113,16 +113,16 @@ class AnonymousNewsletterListTestCase(NewsletterListTestCase):
 
             # Check returned URL's exist and equal result of lookup methods
             self.assertTrue(subscribe_url)
-            self.assertEquals(subscribe_url, n.subscribe_url())
+            self.assertEqual(subscribe_url, n.subscribe_url())
 
             self.assertTrue(unsubscribe_url)
-            self.assertEquals(unsubscribe_url, n.unsubscribe_url())
+            self.assertEqual(unsubscribe_url, n.unsubscribe_url())
 
             self.assertTrue(update_url)
-            self.assertEquals(update_url, n.update_url())
+            self.assertEqual(update_url, n.update_url())
 
             self.assertTrue(archive_url)
-            self.assertEquals(archive_url, n.archive_url())
+            self.assertEqual(archive_url, n.archive_url())
 
             # Request detail URL and assert it links to all other URL's
             response = self.client.get(detail_url)
@@ -165,7 +165,7 @@ class AnonymousNewsletterListTestCase(NewsletterListTestCase):
 
         response = self.client.get(detail_url)
 
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class UserNewsletterListTestCase(UserTestCase,
@@ -241,7 +241,7 @@ class UserNewsletterListTestCase(UserTestCase,
         response = self.client.post(self.list_url, params)
 
         # Make sure the result is a success
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         subscriptions = Subscription.objects.filter(
             user=self.user
@@ -249,7 +249,7 @@ class UserNewsletterListTestCase(UserTestCase,
 
         # Assert all newsletters have related subscriptions now
         self.assertTrue(subscriptions.count())
-        self.assertEquals(
+        self.assertEqual(
             subscriptions.count(),
             self.newsletters.filter(visible=True).count()
         )
@@ -528,7 +528,7 @@ class AnonymousSubscribeTestCase(
 
         subscription_qs = self.n.subscription_set.filter(**kwargs)
 
-        self.assertEquals(subscription_qs.count(), 1)
+        self.assertEqual(subscription_qs.count(), 1)
 
         return subscription_qs[0]
 
@@ -566,7 +566,7 @@ class AnonymousSubscribeTestCase(
         self.assertFalse(subscription.unsubscribed)
 
         """ Check the subscription email. """
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
         activate_url = subscription.subscribe_activate_url()
         full_activate_url = 'http://%s%s' % (self.site.domain, activate_url)
@@ -601,7 +601,7 @@ class AnonymousSubscribeTestCase(
 
         """ Check the subscription email. """
         # no email should be send
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 0)
 
     # Only run this test when settings overrides are available
     @override_settings(NEWSLETTER_CONFIRM_EMAIL_SUBSCRIBE=True)
@@ -638,7 +638,7 @@ class AnonymousSubscribeTestCase(
         This is a regression of #14 on GitHub.
         """
 
-        self.assertEquals(Subscription.objects.all().count(), 0)
+        self.assertEqual(Subscription.objects.all().count(), 0)
 
         # Request subscription
         self.client.post(
@@ -648,7 +648,7 @@ class AnonymousSubscribeTestCase(
             }
         )
 
-        self.assertEquals(Subscription.objects.all().count(), 1)
+        self.assertEqual(Subscription.objects.all().count(), 1)
 
         # Request subscription
         self.client.post(
@@ -658,7 +658,7 @@ class AnonymousSubscribeTestCase(
             }
         )
 
-        self.assertEquals(Subscription.objects.all().count(), 1)
+        self.assertEqual(Subscription.objects.all().count(), 1)
 
     def test_subscribe_twice(self):
         """ Subscribing twice should not be possible. """
@@ -834,7 +834,7 @@ class AnonymousSubscribeTestCase(
         self.assertRedirects(response, self.unsubscribe_email_sent_url)
 
         """ Check the subscription email. """
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
         activate_url = subscription.unsubscribe_activate_url()
         full_activate_url = 'http://%s%s' % (self.site.domain, activate_url)
@@ -872,7 +872,7 @@ class AnonymousSubscribeTestCase(
 
         """ Check the subscription email. """
         # no email should be send
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(NEWSLETTER_CONFIRM_EMAIL_UNSUBSCRIBE=True)
     def test_unsubscribe_request_post_error(self):
@@ -975,7 +975,7 @@ class AnonymousSubscribeTestCase(
         self.assertRedirects(response, self.update_email_sent_url)
 
         """ Check the subscription email. """
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
         activate_url = subscription.update_activate_url()
         full_activate_url = 'http://%s%s' % (self.site.domain, activate_url)
@@ -1003,7 +1003,7 @@ class AnonymousSubscribeTestCase(
 
         """ Check the subscription email. """
         # no email should be send
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(NEWSLETTER_CONFIRM_EMAIL_UPDATE=True)
     def test_update_request_post_error(self):
@@ -1322,7 +1322,7 @@ class ActionTemplateViewMixin(object):
         """ Assertions common for all actions. """
         response = self.client.get(self.get_action_url(action))
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertInContext(response, 'newsletter', Newsletter, self.n)
         self.assertInContext(response, 'action', value=action)
 
