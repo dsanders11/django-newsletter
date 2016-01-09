@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
 from django.core.mail import EmailMultiAlternatives
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import permalink
 from django.template import Context
@@ -577,11 +578,19 @@ class Submission(models.Model):
         try:
             (subject_template, text_template, html_template) = \
                 self.message.newsletter.get_templates('message')
+            current_site = Site.objects.get_current()
+            extra_headers = {
+                'List-Unsubscribe': 'http://%s%s' % (
+                    current_site.domain,
+                    reverse('newsletter_unsubscribe_request',
+                            args=[self.message.newsletter.slug])
+                ),
+            }
 
             for subscription in subscriptions:
                 variable_dict = {
                     'subscription': subscription,
-                    'site': Site.objects.get_current(),
+                    'site': current_site,
                     'submission': self,
                     'message': self.message,
                     'newsletter': self.newsletter,
@@ -599,7 +608,8 @@ class Submission(models.Model):
                 message = EmailMultiAlternatives(
                     subject, text,
                     from_email=self.newsletter.get_sender(),
-                    to=[subscription.get_recipient()]
+                    to=[subscription.get_recipient()],
+                    headers=extra_headers,
                 )
 
                 if html_template:
