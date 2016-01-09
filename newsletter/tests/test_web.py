@@ -177,7 +177,7 @@ class UserNewsletterListTestCase(UserTestCase,
         self.assertEqual(subscriptions.count(), 1)
 
         subscription = subscriptions[0]
-        self.assert_(subscription.create_date)
+        self.assertTrue(subscription.create_date)
 
         return subscriptions[0]
 
@@ -206,7 +206,7 @@ class UserNewsletterListTestCase(UserTestCase,
         )
 
         for form in formset.forms:
-            self.assert_(
+            self.assertTrue(
                 form.instance.newsletter in self.newsletters,
                 "%s not in %s" % (form.instance.newsletter, self.newsletters)
             )
@@ -355,17 +355,17 @@ class SubscribeTestCase(WebTestCase, MailTestCase):
     def test_urls(self):
         # TODO: is performing this test in each subclass
         #     of WebSubscribeTestCase really needed?
-        self.assert_(self.subscribe_url)
-        self.assert_(self.update_url)
-        self.assert_(self.unsubscribe_url)
-        self.assert_(self.subscribe_confirm_url)
-        self.assert_(self.unsubscribe_confirm_url)
-        self.assert_(self.subscribe_email_sent_url)
-        self.assert_(self.update_email_sent_url)
-        self.assert_(self.unsubscribe_email_sent_url)
-        self.assert_(self.subscribe_activated_url)
-        self.assert_(self.update_activated_url)
-        self.assert_(self.unsubscribe_activated_url)
+        self.assertTrue(self.subscribe_url)
+        self.assertTrue(self.update_url)
+        self.assertTrue(self.unsubscribe_url)
+        self.assertTrue(self.subscribe_confirm_url)
+        self.assertTrue(self.unsubscribe_confirm_url)
+        self.assertTrue(self.subscribe_email_sent_url)
+        self.assertTrue(self.update_email_sent_url)
+        self.assertTrue(self.unsubscribe_email_sent_url)
+        self.assertTrue(self.subscribe_activated_url)
+        self.assertTrue(self.update_activated_url)
+        self.assertTrue(self.unsubscribe_activated_url)
 
 
 class UserSubscribeTestCase(
@@ -381,7 +381,7 @@ class UserSubscribeTestCase(
         self.assertEqual(subscriptions.count(), 1)
 
         subscription = subscriptions[0]
-        self.assert_(subscription.create_date)
+        self.assertTrue(subscription.create_date)
 
         return subscriptions[0]
 
@@ -414,7 +414,7 @@ class UserSubscribeTestCase(
         self.assertEqual(response.context['user'], self.user)
 
         subscription = self.get_user_subscription()
-        self.assert_(subscription.subscribed)
+        self.assertTrue(subscription.subscribed)
         self.assertFalse(subscription.unsubscribed)
 
     def test_subscribe_twice(self):
@@ -458,7 +458,7 @@ class UserSubscribeTestCase(
         self.assertContains(response, 'id="id_submit"')
 
         subscription = self.get_user_subscription()
-        self.assert_(subscription.subscribed)
+        self.assertTrue(subscription.subscribed)
         self.assertFalse(subscription.unsubscribed)
 
     def test_unsubscribe_not_subscribed_view(self):
@@ -489,7 +489,7 @@ class UserSubscribeTestCase(
 
         subscription = self.get_user_subscription()
         self.assertFalse(subscription.subscribed)
-        self.assert_(subscription.unsubscribed)
+        self.assertTrue(subscription.unsubscribed)
         self.assertLessThan(
             subscription.unsubscribe_date,
             now() + timedelta(seconds=1)
@@ -712,7 +712,7 @@ class AnonymousSubscribeTestCase(
         )
 
         self.assertFalse(subscription.subscribed)
-        self.assert_(subscription.unsubscribed)
+        self.assertTrue(subscription.unsubscribed)
 
         # Resubscribe request
         response = self.client.post(
@@ -727,7 +727,7 @@ class AnonymousSubscribeTestCase(
         self.assertRedirects(response, self.subscribe_email_sent_url)
 
         # self.assertFalse(subscription.subscribed)
-        self.assert_(subscription.unsubscribed)
+        self.assertTrue(subscription.unsubscribed)
 
         # Activate subscription
         response = self.client.post(
@@ -746,7 +746,7 @@ class AnonymousSubscribeTestCase(
             email_field__exact='test@email.com'
         )
 
-        self.assert_(subscription.subscribed)
+        self.assertTrue(subscription.subscribed)
         self.assertFalse(subscription.unsubscribed)
 
     def test_user_update(self):
@@ -789,7 +789,7 @@ class AnonymousSubscribeTestCase(
         self.assertFalse(subscription.subscribed)
 
         activate_url = subscription.subscribe_activate_url()
-        self.assert_(activate_url)
+        self.assertTrue(activate_url)
 
         response = self.client.get(activate_url)
         self.assertInContext(response, 'form', UpdateForm)
@@ -810,7 +810,7 @@ class AnonymousSubscribeTestCase(
             email_field__exact='test@email.com'
         )
 
-        self.assert_(subscription.subscribed)
+        self.assertTrue(subscription.subscribed)
         self.assertFalse(subscription.unsubscribed)
 
         dt = (subscription.subscribe_date - subscription.create_date).seconds
@@ -940,7 +940,7 @@ class AnonymousSubscribeTestCase(
             email_field__exact=testemail2
         )
 
-        self.assert_(subscription.unsubscribed)
+        self.assertTrue(subscription.unsubscribed)
         self.assertEqual(subscription.name, testname2)
         self.assertEqual(subscription.email, testemail2)
 
@@ -1094,8 +1094,8 @@ class AnonymousSubscribeTestCase(
             email_field__exact=testemail2
         )
 
-        self.assert_(subscription)
-        self.assert_(subscription.subscribed)
+        self.assertTrue(subscription)
+        self.assertTrue(subscription.subscribed)
         self.assertEqual(subscription.name, testname2)
         self.assertEqual(subscription.email, testemail2)
 
