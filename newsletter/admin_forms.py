@@ -492,6 +492,12 @@ class SubmissionAdminForm(forms.ModelForm):
         model = Submission
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super(SubmissionAdminForm, self).__init__(*args, **kwargs)
+
+        field = self.fields['subscriptions']
+       	field.queryset = field.queryset.only('user_id', 'name_field', 'email_field', 'newsletter__title')
+
     def clean_publish(self):
         """
         Make sure only one submission can be published for each message.
