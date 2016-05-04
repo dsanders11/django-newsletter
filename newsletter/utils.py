@@ -10,14 +10,15 @@ from hashlib import sha1
 from django.conf import settings
 
 from django.contrib.sites.models import Site
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 
-from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+
 
 # Possible actions that user can perform
 ACTIONS = ('subscribe', 'unsubscribe', 'update')
-
-logger = logging.getLogger(__name__)
 
 
 def make_activation_code():
