@@ -67,6 +67,10 @@ class NewsletterSettings(Settings):
     DEFAULT_CONFIRM_EMAIL = True
 
     @property
+    def DEFAULT_ASSUME_USER_CONFIRMED_EMAIL(self):
+        return True
+
+    @property
     def DEFAULT_CONFIRM_EMAIL_SUBSCRIBE(self):
         return self.CONFIRM_EMAIL
 

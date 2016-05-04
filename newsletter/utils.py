@@ -1,7 +1,5 @@
 """ Generic helper functions """
 
-import logging
-
 import random
 
 from datetime import datetime
@@ -9,9 +7,6 @@ from hashlib import sha1
 
 from django.contrib.sites.models import Site
 from django.utils.encoding import force_bytes
-
-
-logger = logging.getLogger(__name__)
 
 
 # Possible actions that user can perform
@@ -27,11 +22,6 @@ def make_activation_code():
     combined_string = random_digest + time_string
 
     return sha1(force_bytes(combined_string)).hexdigest()
-
-
-def get_default_sites():
-    """ Get a list of id's for all sites; the default for newsletters. """
-    return [site.id for site in Site.objects.all()]
 
 
 class Singleton(type):
