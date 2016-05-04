@@ -25,11 +25,11 @@ from django.utils.encoding import force_text
 
 from django.test.utils import override_settings, patch_logger
 
-from ..models import (
+from newsletter.models import (
     Newsletter, Subscription, Submission, Message, get_default_sites
 )
 
-from ..forms import UpdateForm
+from newsletter.forms import UpdateForm
 
 from ..utils import  now
 
@@ -615,7 +615,7 @@ class AnonymousSubscribeTestCase(
         """
 
         with override_settings(
-            EMAIL_BACKEND='newsletter.tests.utils.FailingEmailBackend'
+            EMAIL_BACKEND='tests.utils.FailingEmailBackend'
         ):
             with patch_logger('newsletter.views', 'error') as messages:
                 response = self.client.post(
@@ -890,7 +890,7 @@ class AnonymousSubscribeTestCase(
         subscription.save()
 
         with override_settings(
-            EMAIL_BACKEND='newsletter.tests.utils.FailingEmailBackend'
+            EMAIL_BACKEND='tests.utils.FailingEmailBackend'
         ):
             with patch_logger('newsletter.views', 'error') as messages:
                 response = self.client.post(
@@ -1021,7 +1021,7 @@ class AnonymousSubscribeTestCase(
         subscription.save()
 
         with override_settings(
-            EMAIL_BACKEND='newsletter.tests.utils.FailingEmailBackend'
+            EMAIL_BACKEND='tests.utils.FailingEmailBackend'
         ):
 
 
