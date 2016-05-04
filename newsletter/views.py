@@ -278,6 +278,7 @@ class ActionTemplateView(NewsletterMixin, ActionMixin, TemplateView):
     View that renders a template for proper action,
     with newsletter and action in context.
     """
+    pass
 
 
 class ActionFormView(NewsletterMixin, ActionMixin, FormView):
