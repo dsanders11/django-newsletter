@@ -578,13 +578,7 @@ class Submission(models.Model):
 
     @cached_property
     def extra_headers(self):
-        return {
-            'List-Unsubscribe': 'http://%s%s' % (
-                Site.objects.get_current().domain,
-                reverse('newsletter_unsubscribe_request',
-                        args=[self.message.newsletter.slug])
-            ),
-        }
+        return {}
 
     def submit(self):
         subscriptions = self.subscriptions.filter(subscribed=True)
