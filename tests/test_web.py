@@ -31,7 +31,7 @@ from newsletter.models import (
 
 from newsletter.forms import UpdateForm
 
-from ..utils import  now
+from newsletter.utils import now
 
 from .utils import (
     MailTestCase, UserTestCase, WebTestCase, ComparingTestCase, FauxDate

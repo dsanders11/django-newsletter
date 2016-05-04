@@ -2,7 +2,7 @@ from .test_web import (
     AnonymousNewsletterListTestCase, UserNewsletterListTestCase,
     SubscribeTestCase, UserSubscribeTestCase,
     InvisibleAnonymousSubscribeTestCase, InvisibleUserSubscribeTestCase,
-    AnonymousSubscribeTestCase, ArchiveTestcase,
+    AnonymousSubscribeTestCase, ArchiveTestCase,
     ActivationEmailSentUrlTestCase, ActionActivatedUrlTestCase
 )
 

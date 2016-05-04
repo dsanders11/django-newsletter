@@ -54,6 +54,7 @@ class SubscribeRequestForm(NewsletterForm):
             raise ValidationError(_("An e-mail address is required."))
 
         # Check whether we should be subscribed to as a user
+        User = get_user_model()
         if not newsletter_settings.USER_MODE_DISABLED:
             try:
                 user = User.objects.get(email__exact=data)
@@ -67,15 +68,15 @@ class SubscribeRequestForm(NewsletterForm):
             except User.DoesNotExist:
                 pass
         else:
-            User = get_user_model()
             try:
                 user = User.objects.get(email__exact=data)
 
-                raise ValidationError(_(
-                    "The e-mail address '%(email)s' belongs to a user with an "
-                    "account on this site. Please log in as that user "
-                    "and try again."
-                ) % {'email': user.email})
+                if self.user is None or user != self.user:
+                    raise ValidationError(_(
+                        "The e-mail address '%(email)s' belongs to a user "
+                        "with an account on this site. Please log in as that "
+                        "user and try again."
+                    ) % {'email': user.email})
 
             except User.DoesNotExist:
                 pass
