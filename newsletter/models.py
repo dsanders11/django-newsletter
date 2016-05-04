@@ -14,6 +14,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import get_default_timezone, get_current_timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
+from django.utils.timezone import now
 
 from sorl.thumbnail import ImageField
 
@@ -585,6 +586,16 @@ class Submission(models.Model):
             ),
         }
 
+    @cached_property
+    def extra_headers(self):
+        return {
+            'List-Unsubscribe': 'http://%s%s' % (
+                Site.objects.get_current().domain,
+                reverse('newsletter_unsubscribe_request',
+                        args=[self.message.newsletter.slug])
+            ),
+        }
+
     def submit(self):
         subscriptions = self.subscriptions.filter(subscribed=True)
 
@@ -623,7 +634,8 @@ class Submission(models.Model):
 
         unescaped_context = Context(variable_dict, autoescape=False)
 
-        subject = self.message.subject_template.render(unescaped_context).strip()
+        subject = self.message.subject_template.render(
+            unescaped_context).strip()
         text = self.message.text_template.render(unescaped_context)
 
         message = EmailMultiAlternatives(

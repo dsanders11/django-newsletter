@@ -1,7 +1,6 @@
 """ Generic helper functions """
 
 import logging
-logger = logging.getLogger(__name__)
 
 import random
 
@@ -17,6 +16,8 @@ from django.utils import timezone
 
 # Possible actions that user can perform
 ACTIONS = ('subscribe', 'unsubscribe', 'update')
+
+logger = logging.getLogger(__name__)
 
 
 def make_activation_code():
