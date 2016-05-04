@@ -109,7 +109,6 @@ class SubmissionAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin,
         'admin_message', 'admin_newsletter', 'admin_publish_date', 'publish',
         'admin_status_text', 'admin_status'
     )
-    list_display_links = ('message__title',)
     date_hierarchy = 'publish_date'
     list_filter = ('newsletter', 'publish', 'sent')
     save_as = True
@@ -141,7 +140,7 @@ class SubmissionAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin,
             elif obj.get_publish_date() > now():
                 icon = 'wait'
             else:
-                icon = 'submitting'
+                icon = 'submit'
         else:
             icon = 'no'
 
