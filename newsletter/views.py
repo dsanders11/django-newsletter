@@ -101,7 +101,7 @@ class NewsletterListView(NewsletterViewBase, ListView):
             else:
                 Subscription.objects.get_or_create(
                     newsletter=n, email_field=user.email,
-                    name_field=user.get_short_name()
+                    defaults={'name_field': user.get_short_name()}
                 )
 
         # Get all subscriptions for use in the formset
