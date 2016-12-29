@@ -596,7 +596,13 @@ class Submission(models.Model):
 
         try:
             for subscription in subscriptions:
-                self.send_message(subscription)
+                try:
+                    self.send_message(subscription)
+                except Exception as e:
+                    logger.exception(
+                        'Error %s while sending message to %s.',
+                        e, subscription.email
+                    )
             self.sent = True
 
         finally:
